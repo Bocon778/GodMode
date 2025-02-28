@@ -1,0 +1,7 @@
+{
+    "name": "GodMode",
+    "description": "Enabled the GodMode inside of the game.",
+    "version_number": "1.0.0",
+    "website_url": "",
+    "dependencies": []
+  }
