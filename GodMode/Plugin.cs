@@ -2,11 +2,6 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using GodMode.Patches;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodMode
 {
@@ -15,15 +10,22 @@ namespace GodMode
     {
         private const string modGUID = "Bocon.GodMode";
         private const string modeName = "God Mode";
-        private const string modVersion = "1.1.0";
+        private const string modVersion = "1.3.0";
+
+        private const string ASCII_LOGO = @"
+                _____           _  ___  ___          _        _                     _          _        
+               |  __ \         | | |  \/  |         | |      | |                   | |        | |      _   
+               | |  \/ ___   __| | | .  . | ___   __| | ___  | |     ___   __ _  __| | ___  __| |    _| |_    
+               | | __ / _ \ / _` | | |\/| |/ _ \ / _` |/ _ \ | |    / _ \ / _` |/ _` |/ _ \/ _` |   |_   _|
+               | |_\ \ (_) | (_| | | |  | | (_) | (_| |  __/ | |___| (_) | (_| | (_| |  __/ (_| |     |_|
+                \____/\___/ \__,_| \_|  |_/\___/ \__,_|\___| \_____/\___/ \__,_|\__,_|\___|\__,_|
+";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
         private static GodMode Instance;
 
-        internal ManualLogSource mls; 
-
-
+        internal ManualLogSource mls;
 
         void Awake()
         {
@@ -34,11 +36,10 @@ namespace GodMode
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
-            mls.LogInfo("Infinite Health mod loaded");
+            mls.LogInfo(ASCII_LOGO);
 
             harmony.PatchAll(typeof(GodMode));
             harmony.PatchAll(typeof(GodModePatch));
         }
     }
-
 }
