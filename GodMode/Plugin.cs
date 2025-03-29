@@ -10,7 +10,7 @@ namespace GodMode
     {
         private const string modGUID = "Bocon.GodMode";
         private const string modeName = "God Mode";
-        private const string modVersion = "1.3.0";
+        private const string modVersion = "1.4.0";
 
         private const string ASCII_LOGO = @"
                 _____           _  ___  ___          _        _                     _          _        

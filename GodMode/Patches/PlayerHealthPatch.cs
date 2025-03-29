@@ -1,5 +1,6 @@
 using HarmonyLib;
 using UnityEngine;
+using System.Collections;
 
 namespace GodMode.Patches
 {
@@ -7,6 +8,7 @@ namespace GodMode.Patches
     class GodModePatch
     {
         private static bool godModeEnabled = false;
+        private static Coroutine messageCoroutine;
 
         [HarmonyPatch("Start")]
         [HarmonyPostfix]
@@ -19,7 +21,15 @@ namespace GodMode.Patches
         [HarmonyPostfix]
         private static void UpdatePatch(PlayerHealth __instance)
         {
-            if (UnityEngine.Input.GetKeyDown(KeyCode.G))
+            bool isChatActive = false;
+            if (ChatManager.instance != null)
+            {
+                isChatActive = (bool)Traverse.Create(ChatManager.instance)
+                    .Field("chatActive")
+                    .GetValue();
+            }
+
+            if (!isChatActive && UnityEngine.Input.GetKeyDown(KeyCode.G))
             {
                 godModeEnabled = !godModeEnabled;
                 Traverse.Create(__instance).Field("godMode").SetValue(godModeEnabled);
@@ -30,27 +40,30 @@ namespace GodMode.Patches
                     string emoji = godModeEnabled ? "+" : "-";
                     Color mainColor = godModeEnabled ? new Color(0.5f, 1f, 0f) : new Color(1f, 0.3f, 0.3f);
                     Color flashColor = godModeEnabled ? Color.white : Color.black;
-                    
+
+                    if (messageCoroutine != null)
+                    {
+                        __instance.StopCoroutine(messageCoroutine);
+                    }
+
                     BigMessageUI.instance.BigMessage(message, emoji, 42f, mainColor, flashColor);
-                    Traverse.Create(BigMessageUI.instance).Field("bigMessageTimer").SetValue(2f);
+
+                    messageCoroutine = __instance.StartCoroutine(HideMessageAfterDelay(2f));
                 }
+
+                Debug.Log("God Mode: " + (godModeEnabled ? "Enabled" : "Disabled"));
             }
         }
-    }
 
-    [HarmonyPatch(typeof(BigMessageUI))]
-    class BigMessageUIPatch
-    {
-        [HarmonyPatch("Update")]
-        [HarmonyPrefix]
-        private static bool UpdatePrefix(BigMessageUI __instance, ref float ___bigMessageTimer)
+        private static IEnumerator HideMessageAfterDelay(float delay)
         {
-            if (___bigMessageTimer > 0f)
+            yield return new WaitForSeconds(delay);
+            
+            if (BigMessageUI.instance != null)
             {
-                ___bigMessageTimer -= Time.deltaTime * 0.5f;
-                return false;
+                BigMessageUI.instance.Hide();
             }
-            return true;
         }
     }
 }
+
